@@ -5,15 +5,18 @@ import {
   ComboboxOptions,
 } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
-import { CONTACT_LIST_HEADER } from 'constants/admin\bContentTableHeader';
+import { CONTACT_LIST_HEADER } from 'constants/adminContentTableHeader';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
+import useHandleServerReq from 'hooks/useHandleServerReq';
+import { deleteContactData } from 'apis/admin';
 import { getAllBuildingContactInfo } from 'apis/api';
 import { ContactType } from 'types/client.types';
 import { IconClose } from 'public/icons';
 
-const ShowContacts = () => {
+const ShowAndDeleteContacts = () => {
   const { data: allContactInfos } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['contacts'],
     queryFn: getAllBuildingContactInfo,
   });
 
@@ -35,12 +38,11 @@ const ShowContacts = () => {
         onChange={(value) => {
           if (value?._id) setSelectedContact(value!);
         }}
-        onClose={() => setQuery('')}
       >
         <ComboboxInput
           className={'mb-16 w-full rounded-16 px-20 py-12 placeholder-gray-300'}
           placeholder='문의한 유저 ID로 문의 검색'
-          aria-label='Assignee'
+          aria-label='SearchInput'
           displayValue={(contact: ContactType) => contact.name ?? ''}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -70,12 +72,22 @@ const ShowContacts = () => {
 
 const ContactListCell = (props: { contact: ContactType }) => {
   const { contact } = props;
+  const router = useRouter();
 
+  const { handleServerReq } = useHandleServerReq({ router });
+
+  const handleContactDelete = async (id: number) => {
+    handleServerReq({
+      reqFunc: () => deleteContactData(id),
+      toastMsg: '성공적으로 해당 문의 정보를 삭제하였습니다!',
+      queryKey: ['contacts'],
+    });
+  };
   return (
     <div
       className={`flex w-full rounded-4 p-8 text-center font-500 shadow ${contact._id === 0 ? 'bg-[#4a4a4a] text-white' : 'bg-white'}`}
     >
-      <h5 className='w-72 overflow-ellipsis'>
+      <h5 className='w-72 overflow-ellipsis font-800'>
         {contact._id === 0 ? 'ID' : contact._id}
       </h5>
       <h5 className='w-160 overflow-ellipsis'>
@@ -122,9 +134,10 @@ const ContactListCell = (props: { contact: ContactType }) => {
           className='w-40 cursor-pointer overflow-ellipsis text-[#000000]'
           onClick={() => {
             const res = confirm(
-              `ID: ${contact._id} 문의 데이터를 DB에서 정말로 삭제하시겠습니까?`,
+              `[‼️문의 삭제]\nID: ${contact._id}의 문의 데이터를 DB에서 정말로 삭제하시겠습니까?`,
             );
-            //handleDelete();
+            if (!res || !contact._id) return;
+            handleContactDelete(contact._id);
           }}
         >
           <IconClose></IconClose>
@@ -135,4 +148,4 @@ const ContactListCell = (props: { contact: ContactType }) => {
     </div>
   );
 };
-export default ShowContacts;
+export default ShowAndDeleteContacts;

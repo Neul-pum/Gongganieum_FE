@@ -7,8 +7,10 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useCookies } from 'react-cookie';
 import toast from 'react-hot-toast';
 import 'react-quill/dist/quill.snow.css';
+import { authorizeAdmin } from 'apis/admin';
 import { postEditorImage, postMagazine } from 'apis/api';
 
 const EditorPage = () => {
@@ -20,6 +22,7 @@ const EditorPage = () => {
     writer: '',
     category: '',
   });
+  const [cookie, setCookie] = useCookies(['editor_access']);
   const [thumbnailImage, setThumbnailImage] = useState<string>('');
   const [thumbnailImageUrl, setThumbnailImageUrl] = useState<string>('');
   const [editorValue, setEditorValue] = useState('');
@@ -44,18 +47,44 @@ const EditorPage = () => {
 
   // 비밀번호
   const [password, setPassword] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };
 
-  const handlePasswordSubmit = (e: FormEvent) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (password === '1234') {
-      setIsAuthenticated(true);
-    } else {
-      alert('잘못된 비밀번호입니다.');
+
+    if (await isEditorLoginSuccess(password)) {
+      toast.success('에디터로 로그인 되었습니다!');
+      const expiration = new Date(Date.now() + 3600 * 1000); // 1시간
+      setCookie('editor_access', true, {
+        secure: false,
+        sameSite: 'lax',
+        path: '/',
+        expires: expiration,
+      });
+      setIsAuthorized(true);
+    }
+  };
+
+  const isEditorLoginSuccess = async (pwd: string) => {
+    const authorizeStatus = await authorizeAdmin({ pwd, user: 'editor' });
+    switch (authorizeStatus) {
+      case 200:
+        return true;
+      case 409:
+        toast.error(
+          'DB에서 정보를 불러오는 데 오류가 발생하였습니다.\n다시 시도해주세요.',
+        );
+        return false;
+      case 400:
+        toast.error('비밀번호가 잘못되었습니다!');
+        return false;
+      default:
+        toast.error('문제가 발생하였습니다. 관리자에게 문의하세요.');
+        return false;
     }
   };
 
@@ -155,6 +184,11 @@ const EditorPage = () => {
     [],
   );
 
+  useEffect(() => {
+    // Hydration Error 방지 위해 CSR에서 에디터 로그인 여부 쿠키 정보 체크
+    if (cookie.editor_access) setIsAuthorized(true);
+  }, []);
+
   const formats = [
     'header',
     'font',
@@ -174,12 +208,9 @@ const EditorPage = () => {
   return (
     <div className='mx-auto my-40 flex min-h-[60dvh] max-w-1000 flex-col items-center gap-20'>
       {/* 비밀번호 입력 전 */}
-      {!isAuthenticated && (
+      {!isAuthorized && (
         <div className='mx-auto my-40 flex min-h-[60dvh] max-w-1000 items-center gap-20'>
-          <form
-            onSubmit={handlePasswordSubmit}
-            className='flex items-center gap-20'
-          >
+          <form onSubmit={handleLogin} className='flex items-center gap-20'>
             <input
               type='password'
               value={password}
@@ -197,7 +228,7 @@ const EditorPage = () => {
         </div>
       )}
       {/* 비밀번호 입력 후 */}
-      {isAuthenticated && (
+      {isAuthorized && (
         <>
           <div className='flex w-full items-center justify-between'>
             <input

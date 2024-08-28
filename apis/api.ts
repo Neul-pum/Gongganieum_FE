@@ -120,6 +120,12 @@ export const getAllCarouselInfo = async () => {
   return res.data;
 };
 
+// 특정 케러셀 정보 조회
+export const getCarouselInfo = async (id: number) => {
+  const res = await instance.get(`/carousel/infos?id=${id}`);
+  return res.data[0];
+};
+
 // 홈페이지 캐러셀 이미지 조회 (타입: 메인, 프라이머리, 세컨더리, 추천)
 export const getHomeCarousel = async (
   type: 'main_banner' | 'primary' | 'secondary' | 'recommend_banner',

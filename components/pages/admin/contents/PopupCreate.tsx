@@ -6,9 +6,11 @@ import {
   ComboboxOptions,
 } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import useHandleServerReq from 'hooks/useHandleServerReq';
 import { postNewPopupData } from 'apis/admin';
 import { getAllBuildingInfos } from 'apis/api';
 import { PopupType } from 'types/client.types';
@@ -16,24 +18,26 @@ import RequiredStar from 'components/commons/RequiredStar';
 import { IconArrowDown } from 'public/icons';
 import TextInput from '../TextInput';
 
-export type postPopupType =
-  | {
-      keyword: string;
-      building: number;
-    }
-  | PopupType;
+export type postPopupType = {
+  keyword: string;
+  buildingId: number;
+} & PopupType;
 
 interface BuildingIDAddressDictType {
   id: number;
   address: string;
 }
 
-const CreatePopup = () => {
+const PostAndEditPopup = () => {
   const {
     register,
     handleSubmit,
     formState: { isValid },
   } = useForm<postPopupType>();
+
+  const router = useRouter();
+
+  const { handleServerReq } = useHandleServerReq({ router });
 
   const [buildingIDAddressDict, setBuildingIDAddressDict] =
     useState<BuildingIDAddressDictType[]>();
@@ -59,15 +63,13 @@ const CreatePopup = () => {
 
   const handleFormSubmit: SubmitHandler<postPopupType> = async (data) => {
     if (!isFormValid) return;
-    const newPopupData = { ...data, building: selectedBuilding.id };
+    const newPopupData = { ...data, buildingId: selectedBuilding.id };
 
-    try {
-      const response = await postNewPopupData(newPopupData);
-      if (response.status === 200)
-        toast.success('성공적으로 팝업 정보를 등록하였습니다!');
-    } catch {
-      toast.error('문제가 발생하였습니다!');
-    }
+    handleServerReq({
+      reqFunc: () => postNewPopupData(newPopupData),
+      toastMsg: '성공적으로 팝업 정보를 등록하였습니다!',
+      queryKey: ['buildings'],
+    });
   };
 
   const validateForm = () => {
@@ -105,7 +107,6 @@ const CreatePopup = () => {
               onChange={(value) => {
                 setSelectedBuilding(value ?? { id: 0, address: '' });
               }}
-              onClose={() => setQuery('')}
             >
               <div className='relative'>
                 <ComboboxInput
@@ -114,7 +115,7 @@ const CreatePopup = () => {
                   }
                   placeholder='팝업 정보를 추가할 건물 주소 검색'
                   style={{ borderRadius: 20 }}
-                  aria-label='Assignee'
+                  aria-label='SearchInput'
                   displayValue={(Building: BuildingIDAddressDictType) =>
                     Building?.address
                   }
@@ -190,4 +191,4 @@ const CreatePopup = () => {
     </div>
   );
 };
-export default CreatePopup;
+export default PostAndEditPopup;

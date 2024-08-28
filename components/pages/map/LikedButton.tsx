@@ -14,7 +14,7 @@ const LikedButton = (props: { buildings: BuildingType[] }) => {
 
   const handleClick = () => {
     if (!session) {
-      router.push('/login');
+      router.push('/login?isRedirected=true');
       return;
     }
     router.push(

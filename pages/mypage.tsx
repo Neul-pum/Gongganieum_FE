@@ -45,7 +45,7 @@ const Mypage = () => {
 
   useEffect(() => {
     if (!session) {
-      router.push('/login');
+      router.push('/login?isRedirected=true');
     }
   }, []);
 

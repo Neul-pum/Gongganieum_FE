@@ -10,6 +10,7 @@ export const BUILDING_LIST_HEADER = {
   cate: '기타' as CategoryType,
   img: '건물 이미지',
   popups: [],
+  scanUrl: '3D스캔',
 };
 
 export const CONTACT_LIST_HEADER = {

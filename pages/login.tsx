@@ -1,7 +1,17 @@
+import { useRouter } from 'next/router';
+import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 import MetaTag from 'components/commons/MetaTag';
 import LoginBox from 'components/pages/login/LoginBox';
 
 const Login = () => {
+  const router = useRouter();
+  const { isRedirected } = router.query;
+
+  useEffect(() => {
+    if (isRedirected) toast.error('로그인 후 이용할 수 있는 기능입니다.');
+  }, [isRedirected]);
+
   return (
     <>
       <MetaTag title='공간이음 | 로그인' />

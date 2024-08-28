@@ -11,7 +11,7 @@ const HomeMobileBuildingCardSlider = (props: {
   const { mode } = props;
 
   const { data: carouselData } = useQuery({
-    queryKey: ['carousel', mode],
+    queryKey: ['carousels', mode],
     queryFn: () => getHomeCarousel(mode),
   });
 

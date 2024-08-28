@@ -5,13 +5,16 @@ import {
   ComboboxOptions,
 } from '@headlessui/react';
 import { useQuery } from '@tanstack/react-query';
-import { USER_LIST_HEADER } from 'constants/admin\bContentTableHeader';
+import { USER_LIST_HEADER } from 'constants/adminContentTableHeader';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
+import useHandleServerReq from 'hooks/useHandleServerReq';
+import { deleteUserData } from 'apis/admin';
 import { getAllUserInfo } from 'apis/api';
 import { UserDataType } from 'types/client.types';
 import { IconClose } from 'public/icons';
 
-const ShowUsers = () => {
+const ShowAndDeleteUsers = () => {
   const { data: allUserInfos } = useQuery({
     queryKey: ['users'],
     queryFn: getAllUserInfo,
@@ -35,12 +38,11 @@ const ShowUsers = () => {
         onChange={(value) => {
           if (value?._id) setSelectedUser(value!);
         }}
-        onClose={() => setQuery('')}
       >
         <ComboboxInput
           className={'mb-20 w-full rounded-16 px-20 py-12 placeholder-gray-300'}
           placeholder='이름(name)으로 원하는 유저 검색'
-          aria-label='Assignee'
+          aria-label='SearchInput'
           displayValue={(user: UserDataType) => user?.name ?? ''}
           onChange={(event) => setQuery(event.target.value)}
         />
@@ -70,12 +72,23 @@ const ShowUsers = () => {
 
 const UserListCell = (props: { user: UserDataType }) => {
   const { user } = props;
+  const router = useRouter();
+
+  const { handleServerReq } = useHandleServerReq({ router });
+
+  const handleUserDelete = async (id: number) => {
+    handleServerReq({
+      reqFunc: () => deleteUserData(id),
+      toastMsg: '성공적으로 해당 유저 정보를 삭제하였습니다!',
+      queryKey: ['users'],
+    });
+  };
 
   return (
     <div
       className={`flex w-full rounded-4 p-8 text-center font-500 shadow ${user._id === 0 ? 'bg-[#4a4a4a] text-white' : 'bg-white'}`}
     >
-      <h5 className='w-40 overflow-ellipsis'>
+      <h5 className='w-40 overflow-ellipsis font-800'>
         {user._id === 0 ? '유저ID' : user._id}
       </h5>
       <h5 className='w-80 overflow-ellipsis'>{user.name}</h5>
@@ -93,9 +106,11 @@ const UserListCell = (props: { user: UserDataType }) => {
           className={`w-fit cursor-pointer overflow-ellipsis text-[#000000]`}
           onClick={() => {
             const res = confirm(
-              `ID: ${user._id}, 이름: ${user.name} 유저를 DB에서 정말로 삭제하시겠습니까?`,
+              `[‼️유저 삭제]\n ID: ${user._id}, 이름: ${user.name} 유저를 DB에서 정말로 삭제하시겠습니까?`,
             );
-            //handleDelete();
+            if (!res) return;
+
+            handleUserDelete(user._id);
           }}
         >
           <IconClose></IconClose>
@@ -106,4 +121,4 @@ const UserListCell = (props: { user: UserDataType }) => {
     </div>
   );
 };
-export default ShowUsers;
+export default ShowAndDeleteUsers;

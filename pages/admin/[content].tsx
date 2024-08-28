@@ -1,30 +1,35 @@
 import { useRouter } from 'next/router';
 import MetaTag from 'components/commons/MetaTag';
-import CreateBuilding from 'components/pages/admin/contents/CreateBuilding';
-import CreatePopup from 'components/pages/admin/contents/CreatePopup';
-import ShowBuilding from 'components/pages/admin/contents/ShowBuildings';
-import ShowCarousels from 'components/pages/admin/contents/ShowCarousels';
-import ShowContacts from 'components/pages/admin/contents/ShowContacts';
-import ShowUsers from 'components/pages/admin/contents/ShowUsers';
+import PostAndEditBuilding from 'components/pages/admin/contents/BuildingCU';
+import ShowAndDeleteBuilding from 'components/pages/admin/contents/BuildingRD';
+import PostAndEditCarousel from 'components/pages/admin/contents/CarouselCU';
+import ShowAndDeleteCarousels from 'components/pages/admin/contents/CarouselRD';
+import ShowAndDeleteContacts from 'components/pages/admin/contents/ContactRD';
+import PostAndEditPopup from 'components/pages/admin/contents/PopupCreate';
+import ShowAndDeleteUsers from 'components/pages/admin/contents/UserRD';
 
 const AdminRouteContent = () => {
   const router = useRouter();
   const { content } = router.query;
 
-  const getAdminContent = ({ contentParams }: { contentParams: string }) => {
-    switch (contentParams) {
+  const getAdminContent = () => {
+    switch (content) {
       case '건물 목록 조회':
-        return <ShowBuilding></ShowBuilding>;
+        return <ShowAndDeleteBuilding />;
       case '새로운 건물 추가':
-        return <CreateBuilding></CreateBuilding>;
+      case '건물 정보 수정':
+        return <PostAndEditBuilding />;
       case '건물에 새 팝업 정보 추가':
-        return <CreatePopup></CreatePopup>;
+        return <PostAndEditPopup />;
       case '유저 목록 조회':
-        return <ShowUsers></ShowUsers>;
+        return <ShowAndDeleteUsers />;
       case '캐러셀(배너) 목록 조회':
-        return <ShowCarousels></ShowCarousels>;
+        return <ShowAndDeleteCarousels />;
+      case '새로운 캐러셀(배너) 정보 추가':
+      case '캐러셀 정보 수정':
+        return <PostAndEditCarousel />;
       case '문의하기 목록 조회':
-        return <ShowContacts></ShowContacts>;
+        return <ShowAndDeleteContacts />;
       default:
         return <div>문제가 발생했습니다! 처음부터 다시 시작해주세요.</div>;
     }
@@ -34,7 +39,7 @@ const AdminRouteContent = () => {
       <MetaTag title='공간이음 | 관리자' />
       <div className='flex h-full w-full flex-col items-center py-60'>
         <div className='pb-60 text-32 font-700'>{content}</div>
-        {getAdminContent({ contentParams: String(content) })}
+        {getAdminContent()}
       </div>
     </>
   );

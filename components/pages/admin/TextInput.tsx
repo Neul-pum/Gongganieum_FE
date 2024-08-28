@@ -7,8 +7,15 @@ const TextInput = (props: {
   label: string;
   placeholder?: string;
   isRequired?: boolean;
+  type?: string;
 }) => {
-  const { register, label, placeholder = '', isRequired = false } = props;
+  const {
+    register,
+    label,
+    placeholder = '',
+    isRequired = false,
+    type = 'text',
+  } = props;
 
   return (
     <div className='flex w-full items-center justify-between'>
@@ -19,6 +26,7 @@ const TextInput = (props: {
       <input
         {...register}
         placeholder={placeholder ? placeholder : `${label} 입력`}
+        type={type}
         className='w-400 rounded-full bg-[#f1f1f1] px-20 py-12 placeholder-gray-300'
       />
     </div>

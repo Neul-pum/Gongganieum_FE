@@ -31,7 +31,7 @@ const Header = () => {
     setIsLoggedIn(newSession);
   }, [session]);
 
-  const TABS = [
+  const TAB_INFOS = [
     { name: '홈', path: '/', href: '/' },
     {
       name: '지도',
@@ -47,7 +47,7 @@ const Header = () => {
     {
       name: '마이페이지',
       path: '/mypage',
-      href: isLoggedIn ? '/mypage' : '/login',
+      href: isLoggedIn ? '/mypage' : '/login?isRedirected=true',
     },
   ];
 
@@ -102,7 +102,7 @@ const Header = () => {
         {isMenuOpen && (
           <>
             <div className='fixed top-64 z-[4] hidden w-full animate-slideDown flex-col items-start gap-32 bg-white p-20 md:flex'>
-              {TABS.map((el) => (
+              {TAB_INFOS.map((el) => (
                 <Link
                   key={el.name}
                   href={el.href}
@@ -129,7 +129,7 @@ const Header = () => {
               <IconSmallLogo />
             </Link>
             <div className='flex h-full gap-52 md:hidden'>
-              {TABS.map((tab) => (
+              {TAB_INFOS.map((tab) => (
                 <TabButton key={tab.name} path={tab.path} href={tab.href}>
                   {tab.name}
                 </TabButton>

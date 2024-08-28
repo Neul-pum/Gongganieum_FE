@@ -75,7 +75,7 @@ const ContactBox = (props: { id: number; initialIsLiked: boolean }) => {
         <IconShare />
       </button>
       <Link
-        href={session ? `/contact/${id}` : '/login'}
+        href={session ? `/contact/${id}` : '/login?isRedirected=true'}
         className='flex h-full w-full items-center justify-center rounded-8 bg-black text-16 font-700 text-white'
       >
         문의하기

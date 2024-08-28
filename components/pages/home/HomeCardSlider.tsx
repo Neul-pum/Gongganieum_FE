@@ -15,12 +15,12 @@ const HomeCardSlider = (props: { mode: 'primary' | 'secondary' }) => {
   const swiperRef = useRef<SwiperRef>(null);
 
   const { data: primaryCarouselData } = useQuery<CarouselType[]>({
-    queryKey: ['primary-carousel'],
+    queryKey: ['carousels', 'primary-carousel'],
     queryFn: () => getHomeCarousel('primary'),
   });
 
   const { data: secondaryCarouselData } = useQuery<CarouselType[]>({
-    queryKey: ['secondary-carousel'],
+    queryKey: ['carousels', 'secondary-carousel'],
     queryFn: () => getHomeCarousel('secondary'),
   });
 

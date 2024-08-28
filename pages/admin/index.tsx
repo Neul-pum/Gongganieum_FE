@@ -1,40 +1,14 @@
-import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
 import { useRouter } from 'next/router';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import toast from 'react-hot-toast';
-import { getCookieContent } from 'utils/getCookieContent';
 import { authorizeAdmin } from 'apis/admin';
 import MetaTag from 'components/commons/MetaTag';
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext,
-) => {
-  try {
-    let isAdminAuthenticated = false;
-
-    const getAdminAccessCookie = getCookieContent({
-      context: context,
-      name: 'admin_access',
-    });
-
-    if (getAdminAccessCookie) isAdminAuthenticated = true;
-
-    return {
-      props: { isAdminAuthenticated },
-    };
-  } catch {
-    return { notFound: true };
-  }
-};
-
-const Admin = ({
-  isAdminAuthenticated,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+const Admin = () => {
   const [pwd, setPwd] = useState('');
-  const [, setCookie] = useCookies(['admin_access']);
-  const [isAuthorized, setIsAuthorized] =
-    useState<boolean>(isAdminAuthenticated);
+  const [cookie, setCookie] = useCookies(['admin_access']);
+  const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
 
   const ADMIN_CONTENTS = [
     '건물 목록 조회',
@@ -42,12 +16,15 @@ const Admin = ({
     '건물에 새 팝업 정보 추가',
     '유저 목록 조회',
     '캐러셀(배너) 목록 조회',
+    '새로운 캐러셀(배너) 정보 추가',
     '문의하기 목록 조회',
+    '[준비중]',
   ];
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (await isAdminAuthorized({ pwd })) {
+
+    if (await isAdminLoginSuccess(pwd)) {
       toast.success('관리자로 로그인 되었습니다!');
       const expiration = new Date(Date.now() + 3600 * 1000); // 1시간
       setCookie('admin_access', true, {
@@ -60,9 +37,8 @@ const Admin = ({
     }
   };
 
-  const isAdminAuthorized = async (props: { pwd: string }) => {
-    const { pwd } = props;
-    const authorizeStatus = await authorizeAdmin(pwd);
+  const isAdminLoginSuccess = async (pwd: string) => {
+    const authorizeStatus = await authorizeAdmin({ pwd, user: 'admin' });
     switch (authorizeStatus) {
       case 200:
         return true;
@@ -80,6 +56,11 @@ const Admin = ({
     }
   };
 
+  useEffect(() => {
+    // Hydration Error 방지 위해 CSR에서 관리자 로그인 여부 쿠키 정보 체크
+    if (cookie.admin_access) setIsAuthorized(true);
+  }, []);
+
   return (
     <>
       <MetaTag title='공간이음 | 관리자' />
@@ -87,7 +68,7 @@ const Admin = ({
         className={`flex h-[700px] w-full items-center justify-center ${isAuthorized ? 'bg-[#f1f1f1]' : 'bg-white'}`}
       >
         {isAuthorized ? (
-          <div className='grid grid-cols-3 grid-rows-2 gap-72'>
+          <div className='grid grid-cols-4 grid-rows-2 gap-40'>
             {ADMIN_CONTENTS.map((el, idx) => (
               <ContentRouteBtn key={idx} content={el} />
             ))}

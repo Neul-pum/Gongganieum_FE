@@ -19,6 +19,7 @@ import IconChange from './change.svg';
 import IconCharacter from './character.svg';
 import IconCheck from './check.svg';
 import IconCirculation from './circulation.svg';
+import IconCloseButton from './close-btn.svg';
 import IconClose from './close.svg';
 import IconEditPencil from './edit-pencil.svg';
 import IconEtc from './etc.svg';
@@ -86,4 +87,5 @@ export {
   IconHeart,
   IconGrayLike,
   IconSmallLogo,
+  IconCloseButton,
 };
