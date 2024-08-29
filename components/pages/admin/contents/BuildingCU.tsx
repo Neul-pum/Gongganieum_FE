@@ -1,7 +1,7 @@
 import { ROOT_IMAGE_URL } from 'constants/common';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Controller, SubmitHandler, useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import useHandleServerReq from 'hooks/useHandleServerReq';
@@ -58,7 +58,9 @@ function PostAndEditBuilding() {
     if (isPageTypeBuildingEdit) {
       buildingInfoData = {
         ...data,
-        img: editedImgList?.join(', '),
+        coord: data.coord.replaceAll(' ', ''),
+        tag: data?.tag ? data.tag.replaceAll(' ', '') : '',
+        img: editedImgList?.join(','),
         popups: popupJSONStrData
           ? popupJSONStrData.replaceAll('},\n{', '},{')
           : '',
@@ -79,7 +81,7 @@ function PostAndEditBuilding() {
 
     handleServerReq({
       reqFunc,
-      toastMsg: '성공적으로 해당 건물 정보를 추가하였습니다!',
+      toastMsg: '성공적으로 해당 건물 정보를 저장하였습니다!',
       queryKey: ['buildings'],
     });
   };
@@ -89,14 +91,16 @@ function PostAndEditBuilding() {
       toast.error('필수 입력 필드 값을 모두 입력해주세요!');
       return false;
     }
+
     return true;
   };
 
   // save initial values
   useEffect(() => {
     setEditedImgList(
-      initialBuildingInfo?.img ? initialBuildingInfo?.img?.split(', ') : [],
+      initialBuildingInfo?.img ? initialBuildingInfo?.img?.split(',') : [],
     );
+    // 팝업 정보 리스트 출력 할 때 팝업 구분을 위한 줄바꿈 추가
     setPopupJSONStrData(
       initialBuildingInfo?.popups
         ? JSON.stringify(initialBuildingInfo?.popups).replaceAll('},{', '},\n{')
@@ -137,21 +141,41 @@ function PostAndEditBuilding() {
             label='건물 주소'
             isRequired
           />
-          <TextInput
-            register={{ ...register('coord', { required: true }) }}
-            label='건물 좌표'
-            isRequired
-          />
+          <div>
+            <TextInput
+              register={{ ...register('coord', { required: true }) }}
+              label='건물 좌표'
+              isRequired
+            />
+            <WarningText className='mt-[5px] text-right'>
+              <a
+                className='font-600 underline'
+                href={
+                  'https://developers.google.com/maps/documentation/geocoding/overview?hl=ko'
+                }
+                target={'_blank'}
+              >
+                위 사이트(Google Maps Geocoding API)
+              </a>
+              에서 해당 건물 주소에 대한 좌표를 검색하고,
+              <p />
+              위도와 경도 순으로 띄어쓰기 없이 11,22 형태로 입력해주세요.
+            </WarningText>
+          </div>
           <TextInput
             register={{ ...register('scanUrl') }}
             label='3D 스캔 URL 주소'
-            isRequired
           />
-          <TextInput
-            register={{ ...register('tag') }}
-            label='주요 팝업 이력 태그'
-            placeholder='해당 건물의 주요 팝업 이력 입력 (ex: 젠틀몬스터, 무신사, 애플)'
-          />
+          <div>
+            <TextInput
+              register={{ ...register('tag') }}
+              label='주요 팝업 이력 태그'
+              placeholder='해당 건물의 주요 팝업 이력 입력 (ex: 젠틀몬스터,무신사,애플)'
+            />
+            <WarningText className='mt-[5px] text-right'>
+              태그는 띄어쓰기 없이 쉼표(,)로 구분하여 입력해주세요. (ex: A,B,C)
+            </WarningText>
+          </div>
           <div className='flex w-full justify-between'>
             <div className='flex gap-4'>
               <h3 className='text-20 font-600'>직영 건물 여부</h3>
@@ -213,18 +237,18 @@ function PostAndEditBuilding() {
           {isPageTypeBuildingEdit ? (
             <div className='flex w-full flex-col'>
               <div className='flex items-center justify-between'>
-                <h3 className='text-20 font-600'>팝업 정보 리스트</h3>
+                <h3 className='text-20 font-600'>팝업 정보 목록 조회</h3>
                 <button
                   type='button'
                   onClick={() => setIsPopupInfoOpen((prev) => !prev)}
                   className='flex h-[38px] w-fit cursor-pointer items-center rounded-12 bg-[#545454] px-[15px] text-14 text-white'
                 >
-                  {`팝업 정보 리스트 ${isPopupInfoOpen ? '감추기' : '보이기'}`}
+                  {`해당 건물의 팝업 정보 목록 ${isPopupInfoOpen ? '감추기' : '보이기'}`}
                 </button>
               </div>
 
               {isPopupInfoOpen ? (
-                <div className='text-[12px] text-[#e63636]'>
+                <WarningText>
                   현재는 팝업 정보 조회만 가능합니다.
                   <textarea
                     placeholder='해당 건물에 팝업 데이터가 없습니다'
@@ -232,7 +256,7 @@ function PostAndEditBuilding() {
                     value={popupJSONStrData}
                     // onChange={(e) => setPopupJSONStrData(e.target.value)}
                   />
-                </div>
+                </WarningText>
               ) : (
                 <></>
               )}
@@ -243,8 +267,11 @@ function PostAndEditBuilding() {
 
           <div>
             <div className='-mb-32 flex gap-4'>
-              <h3 className='text-20 font-600'>건물 이미지</h3>
-              <RequiredStar />
+              <h3 className='text-20 font-600'>
+                {isPageTypeBuildingEdit
+                  ? '기존 건물 이미지 목록'
+                  : '건물 이미지'}
+              </h3>
             </div>
 
             {/* 이미지 미리보기 */}
@@ -283,16 +310,35 @@ function PostAndEditBuilding() {
           </div>
           <div>
             {isPageTypeBuildingEdit ? (
-              <h3 className='-mb-24 text-20 font-600'>건물 이미지 추가</h3>
+              <h3 className='-mb-24 text-20 font-600'>
+                건물 이미지 새로 추가하기
+              </h3>
             ) : (
               <></>
             )}
+            <WarningText
+              className={`${isPageTypeBuildingEdit ? 'mb-8 mt-[25px]' : ''} `}
+            >
+              {' '}
+              <a
+                className='font-600 underline'
+                href={'https://imagecompressr.com/'}
+                target={'_blank'}
+              >
+                위 사이트(이미지 압축 사이트)
+              </a>
+              에서 300kb이하로 이미지 압축 후, 업로드해주세요.
+            </WarningText>
             <ImageInput setImgFormData={setImgData} />
           </div>
           <button
             title='건물 저장'
             type='submit'
             className='flex h-44 w-full cursor-pointer items-center justify-center rounded-12 bg-black px-[15px] py-[12px] text-center text-18 font-500 text-white'
+            // style={{
+            //   cursor: isSubmitBtnDisabled ? 'not-allowed' : 'pointer',
+            //   backgroundColor: isSubmitBtnDisabled ? '#696969' : 'black',
+            // }}
             onClick={checkIsFormValid}
           >
             {isPageTypeBuildingEdit
@@ -304,4 +350,16 @@ function PostAndEditBuilding() {
     </div>
   );
 }
+
+const WarningText = ({
+  children,
+  className = '',
+}: {
+  children: ReactNode;
+  className?: string;
+}) => {
+  return (
+    <div className={`text-[12px] text-[#e63636] ${className}`}>{children}</div>
+  );
+};
 export default PostAndEditBuilding;

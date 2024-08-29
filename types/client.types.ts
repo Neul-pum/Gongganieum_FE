@@ -77,6 +77,9 @@ export interface UserDataType {
   company: string;
   tag: string;
   role: RoleType;
+  age: string;
+  phone: string;
+  sex: string;
 }
 export interface ContactType {
   _id?: number;

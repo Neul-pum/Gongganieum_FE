@@ -88,19 +88,30 @@ const UserListCell = (props: { user: UserDataType }) => {
     <div
       className={`flex w-full rounded-4 p-8 text-center font-500 shadow ${user._id === 0 ? 'bg-[#4a4a4a] text-white' : 'bg-white'}`}
     >
-      <h5 className='w-40 overflow-ellipsis font-800'>
-        {user._id === 0 ? '유저ID' : user._id}
+      <h5 className='w-44 overflow-ellipsis font-800'>
+        {user._id === 0 ? 'ID' : user._id}
       </h5>
       <h5 className='w-80 overflow-ellipsis'>{user.name}</h5>
       <h5 className='w-80 overflow-ellipsis'>
         {user._id === 0 ? '로그인 상태' : user.role}
       </h5>
       <h5 className='w-140 overflow-ellipsis'>{user.nickname}</h5>
+      <h5 className='w-60 overflow-ellipsis'>{user.age}</h5>
+      <h5 className='w-52 overflow-ellipsis'>
+        {user._id === 0
+          ? '성별'
+          : user.sex === 'M'
+            ? '남성'
+            : user.sex === 'F'
+              ? '여성'
+              : ''}
+      </h5>
       <h5 className='w-220 overflow-ellipsis'>{user.email}</h5>
       <h5 className='w-120 overflow-ellipsis'>{user.company}</h5>
       <h5 className='w-132 overflow-ellipsis'>{user.brand}</h5>
       <h5 className='w-160 overflow-ellipsis'>{user.tag}</h5>
       <h5 className='w-300 overflow-ellipsis'>{user.description}</h5>
+      <h5 className='w-172 overflow-ellipsis'>{user.phone}</h5>
       {user._id ? (
         <div
           className={`w-fit cursor-pointer overflow-ellipsis text-[#000000]`}

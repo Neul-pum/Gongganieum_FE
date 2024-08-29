@@ -35,14 +35,17 @@ export const CONTACT_LIST_HEADER = {
 export const USER_LIST_HEADER = {
   _id: 0,
   name: '이름',
-  email: '이메일',
+  role: 'USER' as RoleType,
   nickname: '닉네임',
+  age: '나이',
+  sex: '성별',
+  email: '이메일',
+  company: '회사명',
+  brand: '주요 제품(서비스)',
+  tag: '관심 분야',
   img: '사진',
   description: '설명',
-  brand: '주요 제품 및 서비스명',
-  company: '회사명',
-  tag: '관심 분야',
-  role: 'USER' as RoleType,
+  phone: '전화번호',
 };
 
 export const CAROUSEL_LIST_HEADER = {

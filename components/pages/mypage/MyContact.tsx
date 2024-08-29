@@ -18,7 +18,7 @@ const MyContact = (props: { contact: UserContactType }) => {
   });
 
   const imageUrls = buildingInfo?.img
-    ?.split(', ')
+    ?.split(',')
     ?.map((url) => ROOT_IMAGE_URL + url);
   const parsedAddedDate = contact.addedDate.split(' ')?.[0];
 

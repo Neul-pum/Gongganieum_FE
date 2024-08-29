@@ -26,7 +26,7 @@ export const postNewCarouselData = async (
 // DATA EDIT API
 // 기존 건물 정보 수정
 export const editBuildingData = async (buildingFormData: FormData) => {
-  const res = await instance.put('/admin/edit/building', buildingFormData);
+  const res = await instance.post('/admin/edit/building', buildingFormData);
   return res;
 };
 

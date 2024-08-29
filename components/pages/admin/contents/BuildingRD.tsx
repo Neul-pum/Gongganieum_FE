@@ -142,7 +142,7 @@ const BuildingCell = (props: { building: showBuildingType }) => {
             className='w-fit cursor-pointer overflow-ellipsis text-[#000000]'
             onClick={() => {
               const res = confirm(
-                `[‼️건물 삭제]\n ID: ${building._id}, 이름: ${building.name} 유저를 DB에서 정말로 삭제하시겠습니까?`,
+                `[‼️건물 삭제]\n ID: ${building._id}, 이름: ${building.name} 건물을 정말로 DB에서 삭제하시겠습니까?`,
               );
               if (!res) return;
               handleBuildingDelete(building._id);

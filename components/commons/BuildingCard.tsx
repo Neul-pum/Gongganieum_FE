@@ -20,7 +20,7 @@ const BuildingCard = (props: {
 
   const isPopup = new Date(latest_end_date ?? '') > new Date();
   const parsedTags = tag === 'NULL' ? [] : tag?.split(',');
-  const imageSrc = img?.split(', ')?.map((url: string) => ROOT_IMAGE_URL + url);
+  const imageSrc = img?.split(',')?.map((url: string) => ROOT_IMAGE_URL + url);
 
   const { isLiked, handleLike } = useLike({
     initialIsLiked: initialIsLiked ?? false,

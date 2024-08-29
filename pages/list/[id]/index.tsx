@@ -24,7 +24,7 @@ const BuildingDescriptionPage = () => {
   });
 
   const imageUrls = buildingInfo?.img
-    ?.split(', ')
+    ?.split(',')
     ?.map((url) => ROOT_IMAGE_URL + url);
 
   const handleGoBack = () => {

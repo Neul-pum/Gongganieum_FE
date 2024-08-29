@@ -51,7 +51,7 @@ const BuildingTab = (props: { id: number }) => {
   };
 
   const imageUrls = buildingInfo?.img
-    ?.split(', ')
+    ?.split(',')
     ?.map((url) => ROOT_IMAGE_URL + url);
 
   const { data: likeBuildingIds } = useQuery({

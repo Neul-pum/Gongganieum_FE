@@ -33,7 +33,7 @@ const BuildingCard = (props: { building: BuildingType }) => {
   const parsedTags = building?.tag === 'NULL' ? [] : building?.tag?.split(',');
   const isPopup = new Date(building?.latest_end_date ?? '') > new Date();
   const imageUrl = building?.img
-    ?.split(', ')
+    ?.split(',')
     ?.map((url) => ROOT_IMAGE_URL + url);
 
   return (

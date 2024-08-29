@@ -9,7 +9,10 @@ import { CarouselType } from 'types/client.types';
 import RequiredStar from 'components/commons/RequiredStar';
 import TextInput from '../TextInput';
 
-export type postCarouselType = Omit<CarouselType, 'content' | '_id'>;
+export type postCarouselType = Omit<
+  CarouselType,
+  'content' | 'contentType' | '_id'
+>;
 
 const CAROUSEL_DROPDOWN_OPTIONS = {
   pageType: ['main', 'map'],
@@ -20,7 +23,6 @@ const CAROUSEL_DROPDOWN_OPTIONS = {
     'recommend_banner',
     'NULL',
   ],
-  contentType: ['Buildings', 'Magazines'],
 };
 
 function PostAndEditCarousel() {
@@ -47,7 +49,6 @@ function PostAndEditCarousel() {
             return {
               pageType: await carouselToEdit.pageType,
               carouselType: await carouselToEdit.carouselType,
-              contentType: await carouselToEdit.contentType,
               contentId: await carouselToEdit.contentId,
             };
           },
@@ -80,10 +81,6 @@ function PostAndEditCarousel() {
       toast.error('필수 입력 필드 값을 모두 입력해주세요!');
       return false;
     }
-    if (getValues('contentType') === 'Magazines') {
-      toast.error('현재 매거진은 캐러셀에 추가할 수 없습니다.');
-      return false;
-    }
 
     return true;
   };
@@ -114,18 +111,23 @@ function PostAndEditCarousel() {
           <DropdownForm
             control={control}
             formRegisterName='pageType'
-            isRequired
-          />
-          <DropdownForm control={control} formRegisterName='carouselType' />
-          <DropdownForm
-            control={control}
-            formRegisterName='contentType'
+            label='캐러셀 페이지 타입'
             isRequired
           />
           <div>
+            <DropdownForm
+              control={control}
+              formRegisterName='carouselType'
+              label='캐러셀 종류'
+            />
+            <h5 className='mt-4 text-right text-12'>
+              * map 페이지에 추가할 경우 NULL 선택
+            </h5>
+          </div>
+          <div>
             <TextInput
               register={{ ...register('contentId', { required: true }) }}
-              label='contentId'
+              label='캐러셀의 빌딩 ID'
               isRequired
               type='number'
             />
@@ -153,10 +155,12 @@ const DropdownForm = ({
   control,
   formRegisterName,
   isRequired = false,
+  label,
 }: {
   control: Control<postCarouselType, any>;
-  formRegisterName: 'pageType' | 'carouselType' | 'contentType';
+  formRegisterName: 'pageType' | 'carouselType';
   isRequired?: boolean;
+  label: string;
 }) => {
   return (
     <Controller
@@ -166,7 +170,7 @@ const DropdownForm = ({
       render={({ field: { onChange, value, ref } }) => (
         <div className='flex w-full items-center justify-between'>
           <div className='flex gap-4'>
-            <h3 className='text-20 font-600'>{formRegisterName}</h3>
+            <h3 className='text-20 font-600'>{label}</h3>
             {isRequired ? <RequiredStar /> : <></>}
           </div>
           <select
