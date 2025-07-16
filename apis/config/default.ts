@@ -3,7 +3,7 @@ import Cookies from 'js-cookie';
 
 export const instance = axios.create({
   //baseURL: process.env.NEXT_PUBLIC_BASE_URL,
-  baseURL: 'http://gongganieum.site/api/',
+  baseURL: 'https://gongganieum.site/api/',
   timeout: 20000,
 });
 
